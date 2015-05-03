@@ -28,7 +28,7 @@ module.exports = RecentFinder =
         @getView().toggle @getEntries()
       'recent-finder:clear': =>
         @entries = []
-        @saveData()
+        @saveData @entries
 
   loadData: ->
     if localStorage['recent-finder']
@@ -36,8 +36,8 @@ module.exports = RecentFinder =
     else
       []
 
-  saveData: ->
-    localStorage['recent-finder'] = JSON.stringify @getEntries()
+  saveData: (data) ->
+    localStorage['recent-finder'] = JSON.stringify data
 
   getEntries: ->
     if atom.config.get('recent-finder.syncImmediately')
@@ -45,18 +45,18 @@ module.exports = RecentFinder =
     (e for e in @entries when fs.existsSync e)
 
   addRecent: (path) ->
-    # [FIXME] need more atomic operation.
     limit = atom.config.get('recent-finder.max')
-    @entries.unshift path
-    @entries = _.uniq(@entries).slice(0, limit)
+    entries = @getEntries()
+    entries.unshift path
+    @entries = _.uniq(entries).slice(0, limit)
     if atom.config.get('recent-finder.syncImmediately')
-      @saveData()
+      @saveData @entries
 
   deactivate: ->
     if @view?
       @view.destroy()
       @view = null
-    @saveData()
+    @saveData @entries
     @subscriptions.dispose()
 
   # I won't depend on serialize/desilialize since its per-project based.

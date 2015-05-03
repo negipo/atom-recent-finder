@@ -2,7 +2,7 @@
   "name": "recent-finder",
   "main": "./lib/recent-finder",
   "version": "0.2.0",
-  "description": "A short description of your package",
+  "description": "Open recently used file with fizzyfinder",
   "repository": "https://github.com/t9md/atom-recent-finder",
   "license": "MIT",
   "engines": {

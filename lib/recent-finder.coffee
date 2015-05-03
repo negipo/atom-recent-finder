@@ -13,8 +13,8 @@ module.exports = RecentFinder =
       description: "max number of entries to remember"
     syncImmediately:
       type: 'boolean'
-      default: false
-      description: "Save recent entries to localStorage on every file open and always read etnries from localStorage. If you want to sync entries across multiple atom windows immediately, this option is for you."
+      default: true
+      description: "If true, save recent entries to localStorage on every file open and always read etnries from localStorage. If you want to sync entries across multiple atom windows immediately, this option is for you."
 
   activate: (state) ->
     @entries = @loadData()

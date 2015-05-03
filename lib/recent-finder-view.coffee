@@ -1,5 +1,4 @@
 path = require 'path'
-fs   = require 'fs-plus'
 packagePath = atom.packages.resolvePackagePath('fuzzy-finder')
 FuzzyFinderView = require path.join(packagePath, 'lib', 'fuzzy-finder-view')
 
@@ -9,8 +8,6 @@ class RecentFinderView extends FuzzyFinderView
     if @panel?.isVisible()
       @cancel()
     else
-      @setItems []
-      # console.log items
       @setItems items
       @show()
 

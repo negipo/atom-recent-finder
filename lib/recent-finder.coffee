@@ -3,44 +3,67 @@ _ = require 'underscore-plus'
 fs = require 'fs-plus'
 
 module.exports = RecentFinder =
+  entries: null
+  db: localStorage
   config:
     max:
-      type:    'integer'
-      default: 100
+      type: 'integer'
+      default: 50
       minimum: 1
+      description: "max number of entries to remember"
+    syncImmediately:
+      type: 'boolean'
+      default: false
+      description: "Save recent entries to localStorage on every file open and always read etnries from localStorage. If you want to sync entries across multiple atom windows immediately, this option is for you."
 
   activate: (state) ->
-    @recentEntries = if state then state.data else []
+    @entries = @loadData()
+
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.workspace.onDidOpen (event) =>
       @addRecent event.item.getPath()
 
     atom.commands.add 'atom-workspace',
       'recent-finder:toggle': =>
-        @createRecentFinderView().toggle(@getRecent())
+        @getView().toggle @getEntries()
+      'recent-finder:clear': =>
+        @entries = []
+        @saveData()
 
-  getRecent: ->
-    (e for e in @recentEntries when fs.existsSync e)
+  loadData: ->
+    if localStorage['recent-finder']
+      JSON.parse localStorage['recent-finder']
+    else
+      []
+
+  saveData: ->
+    localStorage['recent-finder'] = JSON.stringify @getEntries()
+
+  getEntries: ->
+    if atom.config.get('recent-finder.syncImmediately')
+      @entries = @loadData()
+    (e for e in @entries when fs.existsSync e)
 
   addRecent: (path) ->
-    # console.log path
-    @recentEntries.unshift path
-    limit = atom.config.get('recent-finder:max')
-    @recentEntries = _.uniq(@recentEntries).slice(0, limit)
-    # console.log @recentEntries
+    # [FIXME] need more atomic operation.
+    limit = atom.config.get('recent-finder.max')
+    @entries.unshift path
+    @entries = _.uniq(@entries).slice(0, limit)
+    if atom.config.get('recent-finder.syncImmediately')
+      @saveData()
 
   deactivate: ->
-    if @recentFinderView?
-      @recentFinderView.destroy()
-      @recentFinderView = null
+    if @view?
+      @view.destroy()
+      @view = null
+    @saveData()
     @subscriptions.dispose()
 
+  # I won't depend on serialize/desilialize since its per-project based.
   serialize: ->
-    @recentEntries = (e for e in @recentEntries when fs.existsSync e)
-    data: @recentEntries
 
-  createRecentFinderView:  ->
-    unless @recentFinderView?
-      RecentFinderView = require './recent-finder-view'
-      @recentFinderView = new RecentFinderView @recentEntries
-    @recentFinderView
+  getView:  ->
+    unless @view?
+      RecentFinderView  = require './recent-finder-view'
+      @view = new RecentFinderView
+    @view

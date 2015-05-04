@@ -4,7 +4,10 @@ _  = require 'underscore-plus'
 module.exports =
 class Entries
   constructor: () ->
-    @_data = @load()
+    @load()
+
+  needSync: ->
+    atom.config.get 'recent-finder.syncImmediately'
 
   add: (path) ->
     return unless fs.existsSync path
@@ -14,25 +17,22 @@ class Entries
     @set _.uniq(data).slice(0, limit)
 
   set: (data, sync=@needSync()) ->
-    @save data if sync
     @_data = data
+    @save() if sync
 
-  needSync: ->
-    atom.config.get 'recent-finder.syncImmediately'
-
-  clear: ->
-    @set [], true
+  clear: -> @set [], true
 
   get: (sync=@needSync()) ->
-    @_data = @load() if sync
+    @load() if sync
     @_data
 
-  save: (data) ->
-    data = _.filter data, (e) -> fs.existsSync e
-    localStorage['recent-finder'] = JSON.stringify data
+  save: ->
+    @_data = _.filter @_data, (e) -> fs.existsSync e
+    localStorage['recent-finder'] = JSON.stringify @_data
 
   load: ->
-    if localStorage['recent-finder']
-      JSON.parse localStorage['recent-finder']
-    else
-      []
+    @_data =
+      if localStorage['recent-finder']
+        JSON.parse localStorage['recent-finder']
+      else
+        []

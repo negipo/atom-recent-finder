@@ -2,6 +2,8 @@
 
 Open recent file with fuzzyfinder **across** project.
 
+![gif](https://raw.githubusercontent.com/t9md/t9md/27c7505aab5668880e8d1c11ec3a1864cc0555ba/img/atom-recent-finder.gif)
+
 # Why?
 
 Atom don't provide native file-finder for recently opend file.  

@@ -1,3 +1,6 @@
+## 0.4.1 - 2015-05-04
+* Clean up, improve doc.
+
 ## 0.3.1 - 2015-05-04
 * Refactoring.
 

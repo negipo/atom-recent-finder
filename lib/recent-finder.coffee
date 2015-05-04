@@ -1,41 +1,8 @@
 {CompositeDisposable} = require 'atom'
-_ = require 'underscore-plus'
 fs = require 'fs-plus'
+Entries = require './recent-finder-entries'
 
-class Entries
-  constructor: () ->
-    @data = @load()
-
-  add: (path) ->
-    limit = atom.config.get('recent-finder.max')
-    @set _.uniq(@get().unshift path).slice(0, limit)
-
-  set: (data, force) ->
-    if atom.config.get('recent-finder.syncImmediately') or force
-      @save data
-    @data = data
-
-  clear: ->
-    @set [], true
-
-  get: ->
-    if atom.config.get('recent-finder.syncImmediately')
-      @data = @load()
-    @data
-
-  save: (data) ->
-    localStorage['recent-finder'] = JSON.stringify data
-
-  saveExistsOnly: (data) ->
-    @save (e for e in @get() when fs.existsSync e)
-
-  load: ->
-    if localStorage['recent-finder']
-      JSON.parse localStorage['recent-finder']
-    else
-      []
-
-module.exports = RecentFinder =
+module.exports =
   entries: null
   config:
     max:
@@ -53,21 +20,18 @@ module.exports = RecentFinder =
 
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.workspace.onDidOpen (event) =>
-      @addRecent event.item.getPath()
+      @entries.add event.item.getPath()
 
     atom.commands.add 'atom-workspace',
       'recent-finder:toggle': => @getView().toggle @entries.get()
       'recent-finder:clear': => @entries.clear()
 
-  addRecent: (path) ->
-    if fs.existsSync path
-      @entries.add path
-
   deactivate: ->
     if @view?
       @view.destroy()
       @view = null
-    @entries.saveExistsOnly()
+    @entries.save()
+    @entries = null
     @subscriptions.dispose()
 
   # I can't depend on serialize/desilialize since its per-project based.

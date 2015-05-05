@@ -1,6 +1,6 @@
 {CompositeDisposable} = require 'atom'
 fs = require 'fs-plus'
-Entries = require './recent-finder-entries'
+{Entries} = require './recent-finder-entries'
 
 module.exports =
   entries: null

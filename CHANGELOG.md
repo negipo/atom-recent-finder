@@ -1,3 +1,6 @@
+## 0.4.4 - 2015-05-05
+* lazyload with activationCommands
+
 ## 0.4.3 - 2015-05-05
 * cleanup
 * [FIX] critical bug

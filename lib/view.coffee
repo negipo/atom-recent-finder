@@ -3,7 +3,7 @@ pkgRoot = atom.packages.resolvePackagePath('fuzzy-finder')
 FuzzyFinderView = require path.join(pkgRoot, 'lib', 'fuzzy-finder-view')
 
 module.exports =
-class RecentFinderView extends FuzzyFinderView
+class View extends FuzzyFinderView
   toggle: (items) ->
     if @panel?.isVisible()
       @cancel()

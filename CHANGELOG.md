@@ -1,5 +1,6 @@
 ## 0.4.3 - 2015-05-05
-* [FIX] conflict Entries class
+* cleanup
+* [FIX] critical bug
 
 ## 0.4.2 - 2015-05-04
 * ad anime gif in doc.

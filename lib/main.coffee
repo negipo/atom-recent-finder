@@ -1,6 +1,6 @@
 {CompositeDisposable} = require 'atom'
 fs = require 'fs-plus'
-{Entries} = require './recent-finder-entries'
+Entries = require './entries'
 
 module.exports =
   entries: null
@@ -20,12 +20,12 @@ module.exports =
 
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.workspace.onDidOpen (event) =>
-      @entries.add event.item.getPath()
+      @entries.add event.item.getPath?()
 
     atom.commands.add 'atom-workspace',
       'recent-finder:toggle': => @getView().toggle @entries.get()
       'recent-finder:clear': => @entries.clear()
-
+    #
   deactivate: ->
     if @view?
       @view.destroy()
@@ -38,7 +38,4 @@ module.exports =
   serialize: ->
 
   getView:  ->
-    unless @view?
-      RecentFinderView  = require './recent-finder-view'
-      @view = new RecentFinderView
-    @view
+    @view ?= new (require './view')

@@ -1,6 +1,7 @@
 fs = require 'fs-plus'
 _  = require 'underscore-plus'
 
+module.exports =
 class Entries
   constructor: () ->
     @load()
@@ -35,6 +36,3 @@ class Entries
         JSON.parse localStorage['recent-finder']
       else
         []
-
-module.exports =
-  Entries: Entries

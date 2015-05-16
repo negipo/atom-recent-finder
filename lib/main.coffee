@@ -25,7 +25,7 @@ module.exports =
     atom.commands.add 'atom-workspace',
       'recent-finder:toggle': => @getView().toggle @entries.get()
       'recent-finder:clear': => @entries.clear()
-    #
+
   deactivate: ->
     if @view?
       @view.destroy()

@@ -6,17 +6,17 @@ Open recent file with fuzzyfinder **across** project.
 
 # Why?
 
-Atom don't provide native file-finder for recently opend file.  
+Atom don't provide native file-finder for recently opened file.  
 While I'm working on multiple project, sometime I want to open single file from another project as reference, especially while I'm doing some sort of try&err.  
 This package provide `recent-file-finder` **across** project.
 
 Here is the list of finder-command and its target.
 
-| Command     | Target |
-| :------------- | :------------- |
-| `recent-finder:toggle` | recent file **across** project
-| `fuzzy-finder:toggle-buffer-finder` | open buffer |
-| `fuzzy-finder:toggle-file-finder` | file within project |
+| Command                             | Target                         |
+|:------------------------------------|:-------------------------------|
+| `recent-finder:toggle`              | recent file **across** project |
+| `fuzzy-finder:toggle-buffer-finder` | open buffer                    |
+| `fuzzy-finder:toggle-file-finder`   | file within project            |
 
 # Configuration
 
@@ -31,12 +31,6 @@ e.g.
 'atom-workspace:not([mini])':
   'cmd-p': 'recent-finder:toggle'
 ```
-
-
-
-# Settings
-
-* `recent-finder:syncImmediately`: Default:`true`. Save recent entries to localStorage on every file open and always read etnries from localStorage. If you want to sync entries across multiple atom windows immediately, this option is for you.
 
 # Commands
 

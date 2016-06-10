@@ -9,12 +9,6 @@
   ],
   "repository": "https://github.com/t9md/atom-recent-finder",
   "license": "MIT",
-  "activationCommands": {
-    "atom-workspace": [
-      "recent-finder:toggle",
-      "recent-finder:clear"
-    ]
-  },
   "engines": {
     "atom": ">=0.174.0 <2.0.0"
   },

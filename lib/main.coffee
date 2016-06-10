@@ -83,7 +83,6 @@ module.exports =
 
   deactivate: ->
     @view?.destroy()
-    @entries.save()
     @subscriptions.dispose()
     {@view, @subscriptions, @entries} = {}
 

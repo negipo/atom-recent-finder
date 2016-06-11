@@ -1,6 +1,6 @@
 {CompositeDisposable} = require 'atom'
 fs = require 'fs-plus'
-_  = require 'underscore-plus'
+_ = require 'underscore-plus'
 
 requireFromPackage = (packageName, fileName) ->
   path = require 'path'
@@ -18,10 +18,10 @@ class History
     items.unshift(filePath)
     items = _.uniq(items)
     items.splice(atom.config.get('recent-finder.max'))
-    @saveItems(items)
+    localStorage.setItem('recent-finder', JSON.stringify(items))
 
   getAllItems: ->
-    if items = localStorage['recent-finder']
+    if items = localStorage.getItem('recent-finder')
       try
         _.filter(JSON.parse(items), (item) -> fs.existsSync(item))
       catch
@@ -30,10 +30,7 @@ class History
       []
 
   clear: ->
-    @saveItems(undefined)
-
-  saveItems: (items) ->
-    localStorage['recent-finder'] = JSON.stringify(items)
+    localStorage.removeItem('recent-finder')
 
 # View
 # -------------------------

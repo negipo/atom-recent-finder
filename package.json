@@ -2,7 +2,7 @@
   "name": "recent-finder",
   "main": "./lib/main",
   "version": "0.4.4",
-  "description": "Open recently used file with fizzyfinder",
+  "description": "Open recent file with fizzy-finder",
   "keywords": [
     "recent",
     "mru"

@@ -28,7 +28,7 @@ describe "recent-finder", ->
     it "history is empty", ->
       expect(getAllItems()).toEqual([])
 
-  describe "when file opened", ->
+  describe "when file was opened", ->
     it "add filePath to history", ->
       items = [pathFile1, pathFile2, pathFile3]
       openFiles(items...)

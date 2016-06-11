@@ -21,5 +21,5 @@ e.g.
 
 # Commands
 
-* `recent-finder:toggle`: toggle recent-finder
-* `recent-finder:clear`: clear all entry, use this if you are in trouble.
+- `recent-finder:toggle`: Toggle recent-finder
+- `recent-finder:clear`: Clear history

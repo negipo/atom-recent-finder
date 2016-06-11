@@ -13,15 +13,17 @@ FuzzyFinderView = requireFromPackage('fuzzy-finder', 'fuzzy-finder-view')
 # Hisotry management
 # -------------------------
 class History
+  constructor: (@scope) ->
+
   add: (filePath) ->
     items = @getAllItems()
     items.unshift(filePath)
     items = _.uniq(items)
     items.splice(atom.config.get('recent-finder.max'))
-    localStorage.setItem('recent-finder', JSON.stringify(items))
+    localStorage.setItem(@scope, JSON.stringify(items))
 
   getAllItems: ->
-    if items = localStorage.getItem('recent-finder')
+    if items = localStorage.getItem(@scope)
       try
         _.filter(JSON.parse(items), (item) -> fs.existsSync(item))
       catch
@@ -30,7 +32,7 @@ class History
       []
 
   clear: ->
-    localStorage.removeItem('recent-finder')
+    localStorage.removeItem(@scope)
 
 # View
 # -------------------------
@@ -81,7 +83,9 @@ module.exports =
   activate: ->
     notifyAndDeleteSettings('recent-finder', 'syncImmediately')
 
-    @history = new History
+    # in spec-mode, we use different localStorage to avoid modification for actual storage.
+    scope = if atom.inSpecMode() then 'recent-finder-test' else 'recent-finder'
+    @history = new History(scope)
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.workspace.onDidOpen ({item}) =>
       @history.add(filePath) if filePath = item.getPath?()

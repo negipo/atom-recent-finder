@@ -1,26 +1,26 @@
 {CompositeDisposable} = require 'atom'
 fs = require 'fs-plus'
 _  = require 'underscore-plus'
-path = require 'path'
 
-pkgRoot = atom.packages.resolvePackagePath('fuzzy-finder')
-FuzzyFinderView = require path.join(pkgRoot, 'lib', 'fuzzy-finder-view')
+requireFromPackage = (packageName, fileName) ->
+  path = require 'path'
+  packageRoot = atom.packages.resolvePackagePath(packageName)
+  filePath = path.join(packageRoot, 'lib', fileName)
+  require(filePath)
 
-class Entries
+FuzzyFinderView = requireFromPackage('fuzzy-finder', 'fuzzy-finder-view')
+
+# Hisotry management
+# -------------------------
+class History
   add: (filePath) ->
-    items = @getItems()
+    items = @getAllItems()
     items.unshift(filePath)
     items = _.uniq(items)
     items.splice(atom.config.get('recent-finder.max'))
-    @save(items)
+    @saveItems(items)
 
-  save: (items) ->
-    localStorage['recent-finder'] = JSON.stringify(items)
-
-  clear: ->
-    @save([])
-
-  getItems: ->
+  getAllItems: ->
     if items = localStorage['recent-finder']
       try
         _.filter(JSON.parse(items), (item) -> fs.existsSync(item))
@@ -29,6 +29,14 @@ class Entries
     else
       []
 
+  clear: ->
+    @saveItems(undefined)
+
+  saveItems: (items) ->
+    localStorage['recent-finder'] = JSON.stringify(items)
+
+# View
+# -------------------------
 class View extends FuzzyFinderView
   toggle: (items) ->
     if @panel?.isVisible()
@@ -43,6 +51,8 @@ class View extends FuzzyFinderView
     else
       super
 
+# Utility
+# -------------------------
 notifyAndDeleteSettings = (scope, params...) ->
   hasParam = (param) ->
     param of atom.config.get(scope)
@@ -60,26 +70,28 @@ notifyAndDeleteSettings = (scope, params...) ->
     content.push "- `#{param}`"
   atom.notifications.addWarning(content.join("\n"), dismissable: true)
 
+# Main
+# -------------------------
 module.exports =
-  entries: null
+  history: null
   config:
     max:
       type: 'integer'
       default: 50
       minimum: 1
-      description: "max number of entries to remember"
+      description: "Max number of files to remember"
 
   activate: ->
     notifyAndDeleteSettings('recent-finder', 'syncImmediately')
 
-    @entries = new Entries
+    @history = new History
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.workspace.onDidOpen ({item}) =>
-      @entries.add(filePath) if filePath = item.getPath?()
+      @history.add(filePath) if filePath = item.getPath?()
 
-    atom.commands.add 'atom-workspace',
-      'recent-finder:toggle': => @getView().toggle(@entries.getItems())
-      'recent-finder:clear': => @entries.clear()
+    @subscriptions.add atom.commands.add 'atom-workspace',
+      'recent-finder:toggle': => @getView().toggle(@history.getAllItems())
+      'recent-finder:clear': => @history.clear()
 
   deactivate: ->
     @view?.destroy()

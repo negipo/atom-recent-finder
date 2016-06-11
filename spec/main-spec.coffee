@@ -1,11 +1,13 @@
 openFiles = (filePaths...) ->
   waitsForPromise ->
-    promises = (atom.workspace.open(filePath) for filePath in filePaths)
-    Promise.all(promises)
+    Promise.all(atom.workspace.open(filePath) for filePath in filePaths)
+
+dispatchCommand = (command) ->
+  workspaceElement = atom.views.getView(atom.workspace)
+  atom.commands.dispatch(workspaceElement, command)
 
 describe "recent-finder", ->
-  [main] = []
-  [pathFile1, pathFile2, pathFile3] = []
+  [main, pathFile1, pathFile2, pathFile3] = []
 
   getAllItems = ->
     main.history.getAllItems()
@@ -24,25 +26,20 @@ describe "recent-finder", ->
 
   describe "initial state", ->
     it "history is empty", ->
-      expect(getAllItems()).toHaveLength(0)
+      expect(getAllItems()).toEqual([])
 
   describe "when file opened", ->
     it "add filePath to history", ->
-      openFiles(pathFile1, pathFile2, pathFile3)
-      runs ->
-        expect(getAllItems()).toHaveLength(3)
-        expect(getAllItems()).toEqual([pathFile3, pathFile2, pathFile1])
+      items = [pathFile1, pathFile2, pathFile3]
+      openFiles(items...)
+      runs -> expect(getAllItems()).toEqual(items.reverse())
 
   describe "duplicate entries in history", ->
     it "remove older entries", ->
       openFiles(pathFile1, pathFile2)
-      runs ->
-        expect(getAllItems()).toHaveLength(2)
-        expect(getAllItems()).toEqual([pathFile2, pathFile1])
+      runs -> expect(getAllItems()).toEqual([pathFile2, pathFile1])
       openFiles(pathFile1)
-      runs ->
-        expect(getAllItems()).toHaveLength(2)
-        expect(getAllItems()).toEqual([pathFile1, pathFile2])
+      runs -> expect(getAllItems()).toEqual([pathFile1, pathFile2])
 
   describe "recent-finder.max setting", ->
     beforeEach ->
@@ -50,21 +47,28 @@ describe "recent-finder", ->
 
     it "remove older entries", ->
       openFiles(pathFile1, pathFile2)
-      runs ->
-        expect(getAllItems()).toHaveLength(2)
-        expect(getAllItems()).toEqual([pathFile2, pathFile1])
+      runs -> expect(getAllItems()).toEqual([pathFile2, pathFile1])
       openFiles(pathFile3)
-      runs ->
-        expect(getAllItems()).toHaveLength(2)
-        expect(getAllItems()).toEqual([pathFile3, pathFile2])
+      runs -> expect(getAllItems()).toEqual([pathFile3, pathFile2])
 
   describe "recent-finder:clear command", ->
     it "clear history", ->
-      openFiles(pathFile1, pathFile2, pathFile3)
+      items = [pathFile1, pathFile2, pathFile3]
+      openFiles(items...)
       runs ->
-        expect(getAllItems()).toHaveLength(3)
-        expect(getAllItems()).toEqual([pathFile3, pathFile2, pathFile1])
-        workspaceElement = atom.views.getView(atom.workspace)
-        atom.commands.dispatch(workspaceElement, 'recent-finder:clear')
-        expect(getAllItems()).toHaveLength(0)
+        expect(getAllItems()).toEqual(items.reverse())
+        dispatchCommand('recent-finder:clear')
         expect(getAllItems()).toEqual([])
+
+  describe "recent-finder:toggle command", ->
+    beforeEach ->
+      spyOn(main.getView(), 'toggle')
+
+    it "open fuzzy-finder view with items in history", ->
+      items = [pathFile1, pathFile2, pathFile3]
+      itemsReversed = items.slice().reverse()
+      openFiles(items...)
+      runs ->
+        expect(getAllItems()).toEqual(itemsReversed)
+        dispatchCommand('recent-finder:toggle')
+        expect(main.getView().toggle).toHaveBeenCalledWith(itemsReversed)

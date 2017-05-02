@@ -1,3 +1,6 @@
+## 0.5.1
+- Fix: no longer throw error on `recent-finder:toggle`
+
 ## 0.5.0
 - Cleanup
 - Breaking: Remove `recent-finder.syncImmediately`, setting, now always read/write to localStorage.

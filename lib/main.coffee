@@ -44,11 +44,8 @@ class View extends FuzzyFinderView
       @setItems(items)
       @show()
 
-  getEmptyMessage: (itemCount) ->
-    if itemCount is 0
-      'No file opend recently'
-    else
-      super
+  getEmptyMessage: ->
+    'No file opened recently'
 
 # Utility
 # -------------------------
